@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lambdah Admin — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep:       #0b0f1a;
+            --bg-card:       #111827;
+            --bg-sidebar:    #0d1120;
+            --border:        rgba(255,255,255,0.07);
+            --accent-blue:   #3b82f6;
+            --accent-teal:   #14b8a6;
+            --accent-glow:   rgba(59,130,246,0.18);
+            --text-primary:  #f1f5f9;
+            --text-muted:    #64748b;
+            --text-dim:      #94a3b8;
+            --danger:        #ef4444;
+            --success:       #22c55e;
+            --warn:          #f59e0b;
+            --radius:        10px;
+            --mono:          'Space Mono', monospace;
+            --sans:          'DM Sans', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── Sidebar ─── */
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-mark {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -1px;
+        }
+
+        .logo-text {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .logo-text span { color: var(--accent-teal); }
+
+        .sidebar-section {
+            padding: 18px 12px 6px;
+            font-size: 10px;
+            font-family: var(--mono);
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .sidebar nav { flex: 1; padding: 8px 12px; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            color: var(--text-dim);
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            text-decoration: none;
+            margin-bottom: 2px;
+        }
+
+        .nav-item i { width: 16px; font-size: 13px; }
+
+        .nav-item:hover {
+            background: rgba(59,130,246,0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(59,130,246,0.18), rgba(20,184,166,0.08));
+            color: var(--accent-blue);
+            border-left: 2px solid var(--accent-blue);
+        }
+
+        .badge {
+            margin-left: auto;
+            background: var(--accent-blue);
+            color: #fff;
+            font-size: 10px;
+            font-family: var(--mono);
+            padding: 2px 7px;
+            border-radius: 20px;
+        }
+        .badge.warn { background: var(--warn); }
+
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .admin-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: #fff;
+        }
+
+        .admin-info { flex: 1; }
+        .admin-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+        .admin-role { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+        /* ─── Main Content ─── */
+        .main {
+            margin-left: 240px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ─── Topbar ─── */
+        .topbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 28px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+        }
+
+        .topbar-left h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .topbar-left p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s ease;
+            font-family: var(--sans);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+        .btn-outline:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        .btn-danger {
+            background: rgba(239,68,68,0.12);
+            color: var(--danger);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+        .btn-success {
+            background: rgba(34,197,94,0.12);
+            color: var(--success);
+            border: 1px solid rgba(34,197,94,0.2);
+        }
+        .btn-success:hover { background: rgba(34,197,94,0.22); }
+
+        .btn-sm { padding: 5px 11px; font-size: 12px; }
+
+        /* ─── Page Content ─── */
+        .content { padding: 28px; flex: 1; }
+
+        /* ─── Panels (tabs) ─── */
+        .panel { display: none; }
+        .panel.active { display: block; animation: fadeIn 0.25s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Stats Row ─── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .stat-card:hover { border-color: rgba(59,130,246,0.3); }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        .stat-card.blue::before  { background: rgba(59,130,246,0.15); }
+        .stat-card.teal::before  { background: rgba(20,184,166,0.15); }
+        .stat-card.warn::before  { background: rgba(245,158,11,0.15); }
+        .stat-card.green::before { background: rgba(34,197,94,0.15); }
+
+        .stat-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        .stat-icon.blue  { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .stat-icon.teal  { background: rgba(20,184,166,0.15); color: var(--accent-teal); }
+        .stat-icon.warn  { background: rgba(245,158,11,0.15);  color: var(--warn); }
+        .stat-icon.green { background: rgba(34,197,94,0.15);   color: var(--success); }
+
+        .stat-value {
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        /* ─── Section Header ─── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ─── Table ─── */
+        .table-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead tr {
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-family: var(--mono);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        td {
+            padding: 13px 16px;
+            font-size: 13.5px;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.015); }
+
+        .post-title-cell { color: var(--text-primary); font-weight: 500; max-width: 260px; }
+        .post-title-cell small { display: block; font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 2px; }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            font-family: var(--mono);
+        }
+        .tag.published { background: rgba(34,197,94,0.1);  color: var(--success);      border: 1px solid rgba(34,197,94,0.2); }
+        .tag.draft     { background: rgba(245,158,11,0.1); color: var(--warn);          border: 1px solid rgba(245,158,11,0.2); }
+        .tag.approved  { background: rgba(20,184,166,0.1); color: var(--accent-teal);   border: 1px solid rgba(20,184,166,0.2); }
+        .tag.pending   { background: rgba(245,158,11,0.1); color: var(--warn);          border: 1px solid rgba(245,158,11,0.2); }
+
+        .actions { display: flex; gap: 6px; }
+
+        /* ─── Filters bar ─── */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: var(--text-primary);
+            font-family: var(--sans);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-input:focus { border-color: var(--accent-blue); }
+
+        select.search-input { cursor: pointer; }
+
+        /* ─── Modal ─── */
+        .modal-bg {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-bg.open { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            width: 680px;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.25s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 22px 24px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title { font-size: 16px; font-weight: 600; }
+
+        .modal-close {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.18s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.07); color: var(--text-primary); }
+
+        .modal-body { padding: 22px 24px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+        .form-row.full { grid-template-columns: 1fr; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+        label {
+            font-size: 12px;
+            font-family: var(--mono);
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        input[type=text], input[type=email], textarea, select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-size: 13.5px;
+            color: var(--text-primary);
+            font-family: var(--sans);
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent-blue); }
+        textarea { resize: vertical; min-height: 100px; }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ─── Comment card ─── */
+        .comment-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        .comment-card:hover { border-color: rgba(59,130,246,0.25); }
+
+        .comment-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .comment-avatar {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: #fff;
+            flex-shrink: 0;
+        }
+
+        .comment-who { flex: 1; }
+        .comment-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+        .comment-email { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+        .comment-post-ref {
+            font-size: 11px;
+            background: rgba(59,130,246,0.08);
+            border: 1px solid rgba(59,130,246,0.15);
+            color: var(--accent-blue);
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-family: var(--mono);
+        }
+
+        .comment-body {
+            font-size: 13.5px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .comment-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .comment-date { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+
+        /* ─── Toast ─── */
+        .toast-container {
+            position: fixed;
+            top: 20px; right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 260px;
+            animation: toastIn 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error   { border-left: 3px solid var(--danger); }
+        .toast.info    { border-left: 3px solid var(--accent-blue); }
+
+        /* ─── Empty state ─── */
+        .empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+        .empty i { font-size: 32px; margin-bottom: 10px; opacity: 0.4; display: block; }
+        .empty p { font-size: 14px; }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-mark">LS</div>
+        <div class="logo-text">Lambdah<span>.dev</span></div>
+    </div>
+
+    <nav>
+        <div class="sidebar-section">Menu</div>
+        <a href="#" class="nav-item active" data-panel="overview" onclick="switchPanel(this,'overview')">
+            <i class="fa fa-gauge-high"></i> Overview
+        </a>
+        <a href="#" class="nav-item" data-panel="posts" onclick="switchPanel(this,'posts')">
+            <i class="fa fa-newspaper"></i> Blog Posts
+        </a>
+        <a href="#" class="nav-item" data-panel="comments" onclick="switchPanel(this,'comments')">
+            <i class="fa fa-comments"></i> Comments
+            <span class="badge warn" id="pending-badge">0</span>
+        </a>
+
+        <div class="sidebar-section" style="margin-top:8px">Account</div>
+        <a href="{{ url_for('admin_logout') }}" class="nav-item">
+            <i class="fa fa-right-from-bracket"></i> Logout
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="admin-chip">
+            <div class="avatar">EL</div>
+            <div class="admin-info">
+                <div class="admin-name">Emeka Lambdah</div>
+                <div class="admin-role">root · admin</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1 id="page-title">Dashboard Overview</h1>
+            <p id="page-sub">Welcome back, Emeka.</p>
+        </div>
+        <div class="topbar-actions">
+            <button class="btn btn-primary" onclick="openModal('create')">
+                <i class="fa fa-plus"></i> New Post
+            </button>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+
+        <!-- ── OVERVIEW ── -->
+        <div class="panel active" id="panel-overview">
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-icon blue"><i class="fa fa-newspaper"></i></div>
+                    <div class="stat-value" id="stat-total">{{ total_posts }}</div>
+                    <div class="stat-label">Total Posts</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon green"><i class="fa fa-circle-check"></i></div>
+                    <div class="stat-value" id="stat-pub">{{ published_posts }}</div>
+                    <div class="stat-label">Published</div>
+                </div>
+                <div class="stat-card warn">
+                    <div class="stat-icon warn"><i class="fa fa-clock"></i></div>
+                    <div class="stat-value" id="stat-pending-c">{{ pending_comments }}</div>
+                    <div class="stat-label">Pending Comments</div>
+                </div>
+                <div class="stat-card teal">
+                    <div class="stat-icon teal"><i class="fa fa-eye"></i></div>
+                    <div class="stat-value" id="stat-views">{{ total_views }}</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+                <div class="stat-card teal">
+                <div class="stat-icon teal"><i class="fa fa-file-arrow-down"></i></div>
+                <div class="stat-value" id="stat-resume-dl">{{ resume_download_count }}</div>
+                <div class="stat-label">Resume Downloads</div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <span class="section-title">Recent Posts</span>
+                <a href="#" class="btn btn-outline btn-sm" onclick="switchPanel(document.querySelector('[data-panel=posts]'),'posts')">
+                    View All
+                </a>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Views</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in recent_posts %}
+                        <tr>
+                            <td class="post-title-cell">
+                                {{ post.title }}
+                                <small>/{{ post.slug }}</small>
+                            </td>
+                            <td>{{ post.category or '—' }}</td>
+                            <td><span style="font-family:var(--mono);font-size:12px;">{{ post.views }}</span></td>
+                            <td>
+                                <span class="tag {{ 'published' if post.is_published else 'draft' }}">
+                                    <i class="fa fa-circle" style="font-size:6px;"></i>
+                                    {{ 'Published' if post.is_published else 'Draft' }}
+                                </span>
+                            </td>
+                            <td style="font-family:var(--mono);font-size:11px;">{{ post.created_at.strftime('%b %d, %Y') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5"><div class="empty"><i class="fa fa-newspaper"></i><p>No posts yet.</p></div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── POSTS ── -->
+        <div class="panel" id="panel-posts">
+            <div class="filter-bar">
+                <input type="text" class="search-input" placeholder="Search posts…" oninput="filterTable(this.value)">
+                <select class="search-input" style="max-width:160px;" onchange="filterByStatus(this.value)">
+                    <option value="">All Status</option>
+                    <option value="published">Published</option>
+                    <option value="draft">Draft</option>
+                </select>
+                <button class="btn btn-primary" onclick="openModal('create')">
+                    <i class="fa fa-plus"></i> New Post
+                </button>
+            </div>
+
+            <div class="table-wrap">
+                <table id="posts-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Tags</th>
+                            <th>Views</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="posts-tbody">
+                        {% for post in posts %}
+                        <tr data-status="{{ 'published' if post.is_published else 'draft' }}"
+                            data-title="{{ post.title|lower }}"
+                            data-post="{{ post.to_dict()|tojson|forceescape }}">
+                            <td class="post-title-cell">
+                                {{ post.title }}
+                                <small>/{{ post.slug }}</small>
+                            </td>
+                            <td>{{ post.category or '—' }}</td>
+                            <td style="font-size:11px; color:var(--text-muted);">{{ post.tags or '—' }}</td>
+                            <td style="font-family:var(--mono);font-size:12px;">{{ post.views }}</td>
+                            <td>
+                                <span class="tag {{ 'published' if post.is_published else 'draft' }}">
+                                    <i class="fa fa-circle" style="font-size:6px;"></i>
+                                    {{ 'Published' if post.is_published else 'Draft' }}
+                                </span>
+                            </td>
+                            <td style="font-family:var(--mono);font-size:11px;">{{ post.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="actions">
+                                    <button class="btn btn-outline btn-sm edit-btn" data-id="{{ post.id }}">
+                                        <i class="fa fa-pen"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ post.id }}, '{{ post.title|replace("'", "\\'") }}')">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty">
+                                    <i class="fa fa-newspaper"></i>
+                                    <p>No posts yet. Create your first one!</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── COMMENTS ── -->
+        <div class="panel" id="panel-comments">
+            <div class="filter-bar">
+                <select class="search-input" style="max-width:200px;" onchange="filterComments(this.value)">
+                    <option value="pending">Pending Approval</option>
+                    <option value="approved">Approved</option>
+                    <option value="all">All Comments</option>
+                </select>
+            </div>
+
+            <div id="comments-list">
+                {% for comment in comments %}
+                    <div class="comment-card" id="comment-{{ comment.id }}"
+                         data-status="{{ 'approved' if comment.is_approved else 'pending' }}">
+                        <div class="comment-meta">
+                            <div class="comment-avatar">{{ comment.name[0]|upper }}</div>
+                            <div class="comment-who">
+                                <div class="comment-name">{{ comment.name }}</div>
+                                <div class="comment-email">{{ comment.email }}</div>
+                            </div>
+                            <span class="comment-post-ref">{{ comment.post.title[:30] }}…</span>
+                            <span class="tag {{ 'approved' if comment.is_approved else 'pending' }}"
+                                  id="comment-tag-{{ comment.id }}">
+                                {{ 'Approved' if comment.is_approved else 'Pending' }}
+                            </span>
+                        </div>
+                        <div class="comment-body">{{ comment.comment }}</div>
+                        <div class="comment-footer">
+                            <span class="comment-date">{{ comment.created_at.strftime('%b %d, %Y · %H:%M') }}</span>
+                            <div class="actions" id="comment-actions-{{ comment.id }}">
+                                {% if not comment.is_approved %}
+                                <button class="btn btn-success btn-sm" onclick="approveComment({{ comment.id }})">
+                                    <i class="fa fa-check"></i> Approve
+                                </button>
+                                {% else %}
+                                <button class="btn btn-outline btn-sm" onclick="unapproveComment({{ comment.id }})">
+                                    <i class="fa fa-rotate-left"></i> Undo
+                                </button>
+                                {% endif %}
+                                <button class="btn btn-danger btn-sm" onclick="deleteComment({{ comment.id }})">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="empty"><i class="fa fa-comments"></i><p>No comments yet.</p></div>
+                    {% endfor %}
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</div><!-- /main -->
+
+
+<!-- ─── Create/Edit Post Modal ─── -->
+<div class="modal-bg" id="post-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title" id="modal-title">New Blog Post</span>
+            <button class="modal-close" onclick="closeModal('post-modal')"><i class="fa fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="post-form" method="POST">
+                <input type="hidden" name="post_id" id="form-post-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" name="title" id="form-title" required placeholder="Post title…">
+                    </div>
+                    <div class="form-group">
+                        <label>Slug *</label>
+                        <input type="text" name="slug" id="form-slug" required placeholder="post-url-slug">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" name="category" id="form-category" placeholder="e.g. Python, React…">
+                    </div>
+                    <div class="form-group">
+                        <label>Tags (comma separated)</label>
+                        <input type="text" name="tags" id="form-tags" placeholder="flask, python, api">
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Excerpt</label>
+                        <textarea name="excerpt" id="form-excerpt" rows="2" placeholder="Short summary for cards and previews…"></textarea>
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Content (HTML / Markdown) *</label>
+                        <textarea name="content" id="form-content" rows="8" required placeholder="Write your post content here…"></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                   <div class="form-group">
+                        <label>Featured Image</label>
+                        <input type="file" name="featured_image" id="form-image" accept="image/*"
+                               style="display:none;" onchange="previewImage(this)">
+                        <div id="image-drop-zone" onclick="document.getElementById('form-image').click()"
+                             style="
+                                border: 2px dashed rgba(255,255,255,0.1);
+                                border-radius: 8px;
+                                padding: 20px;
+                                text-align: center;
+                                cursor: pointer;
+                                transition: border-color 0.2s, background 0.2s;
+                                background: rgba(255,255,255,0.02);
+                             "
+                             onmouseover="this.style.borderColor='var(--accent-blue)'; this.style.background='rgba(59,130,246,0.05)'"
+                             onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.02)'">
+                            <div id="image-placeholder">
+                                <i class="fa fa-cloud-arrow-up" style="font-size:22px; color:var(--text-muted); display:block; margin-bottom:6px;"></i>
+                                <span style="font-size:12px; color:var(--text-muted);">Click to select image</span>
+                            </div>
+                            <img id="image-preview" src="" alt="Preview"
+                                 style="display:none; max-height:120px; max-width:100%; border-radius:6px; object-fit:cover;">
+                        </div>
+                        <input type="hidden" name="featured_image_url" id="form-image-url">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="is_published" id="form-status">
+                            <option value="1">Published</option>
+                            <option value="0">Draft</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('post-modal')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitPost()">
+                <i class="fa fa-floppy-disk"></i> Save Post
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Delete Confirm Modal ─── -->
+<div class="modal-bg" id="delete-modal">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal-header">
+            <span class="modal-title">Delete Post</span>
+            <button class="modal-close" onclick="closeModal('delete-modal')"><i class="fa fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--text-dim);font-size:14px;line-height:1.6;">
+                Are you sure you want to delete <strong id="delete-title" style="color:var(--text-primary);"></strong>?
+                This action cannot be undone.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('delete-modal')">Cancel</button>
+            <button class="btn btn-danger" onclick="executeDelete()">
+                <i class="fa fa-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toasts"></div>
+
+
+<script>
+    // ── Panel switching ──
+    function switchPanel(el, id) {
+        if (typeof el === 'string') el = document.querySelector(`[data-panel="${el}"]`);
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + id).classList.add('active');
+        const titles = { overview: ['Dashboard Overview','Welcome back, Emeka.'], posts: ['Blog Posts','Manage your articles'], comments: ['Comments','Review & moderate'], };
+        document.getElementById('page-title').textContent = titles[id][0];
+        document.getElementById('page-sub').textContent = titles[id][1];
+    }
+
+    // ── Auto-generate slug ──
+    document.getElementById('form-title').addEventListener('input', function () {
+        if (!document.getElementById('form-post-id').value) {
+            document.getElementById('form-slug').value = this.value
+                .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+    });
+
+    // ── Modals ──
+    let deleteTargetId = null;
+
+    function openModal(type) {
+        document.getElementById('modal-title').textContent = 'New Blog Post';
+        document.getElementById('post-form').reset();
+        document.getElementById('form-post-id').value = '';
+        document.getElementById('post-modal').classList.add('open');
+    }
+
+        function openEditModal(postId, post) {
+        document.getElementById('modal-title').textContent = 'Edit Post';
+        document.getElementById('form-post-id').value = postId;
+        document.getElementById('form-title').value = post.title || '';
+        document.getElementById('form-slug').value = post.slug || '';
+        document.getElementById('form-category').value = post.category || '';
+        document.getElementById('form-tags').value = Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || '');
+        document.getElementById('form-excerpt').value = post.excerpt || '';
+        document.getElementById('form-content').value = post.content || '';
+        document.getElementById('form-status').value = post.is_published ? '1' : '0';
+    
+        // Restore existing image if any
+        const preview = document.getElementById('image-preview');
+        const placeholder = document.getElementById('image-placeholder');
+        const urlInput = document.getElementById('form-image-url');
+        if (post.featured_image) {
+            preview.src = post.featured_image;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+            urlInput.value = post.featured_image;
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+            placeholder.style.display = 'block';
+            urlInput.value = '';
+        }
+    
+        document.getElementById('post-modal').classList.add('open');
+    }
+    
+    
+    // Safe edit button handler — reads from data attribute, no inline JSON
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.edit-btn');
+    if (!btn) return;
+
+    const row = btn.closest('tr');
+    const postId = btn.getAttribute('data-id');
+    const post = JSON.parse(row.getAttribute('data-post'));
+    openEditModal(postId, post);
+});
+    
+    function previewImage(input) {
+        const preview = document.getElementById('image-preview');
+        const placeholder = document.getElementById('image-placeholder');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function openModal(type) {
+        document.getElementById('modal-title').textContent = 'New Blog Post';
+        document.getElementById('post-form').reset();
+        document.getElementById('form-post-id').value = '';
+        // Reset image preview
+        document.getElementById('image-preview').src = '';
+        document.getElementById('image-preview').style.display = 'none';
+        document.getElementById('image-placeholder').style.display = 'block';
+        document.getElementById('form-image-url').value = '';
+        document.getElementById('post-modal').classList.add('open');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function confirmDelete(id, title) {
+        deleteTargetId = id;
+        document.getElementById('delete-title').textContent = '"' + title + '"';
+        document.getElementById('delete-modal').classList.add('open');
+    }
+
+    // ── Submit post (create or update) ──
+    function submitPost() {
+    const id = document.getElementById('form-post-id').value;
+    const url = id ? `/admin/posts/${id}/update` : '/admin/posts/create';
+    const formEl = document.getElementById('post-form');
+    const body = new FormData(formEl);
+
+    // If no new file selected but there's an existing URL, pass it along
+    const fileInput = document.getElementById('form-image');
+    const existingUrl = document.getElementById('form-image-url').value;
+    if (fileInput.files.length === 0 && existingUrl) {
+        body.append('featured_image_existing', existingUrl);
+    }
+
+    fetch(url, { method: 'POST', body })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                closeModal('post-modal');
+                showToast(data.message || 'Saved!', 'success');
+                setTimeout(() => location.reload(), 900);
+            } else {
+                showToast(data.message || 'Error saving post.', 'error');
+            }
+        }).catch(() => showToast('Network error.', 'error'));
+}
+
+    // ── Delete post ──
+    function executeDelete() {
+        if (!deleteTargetId) return;
+        fetch(`/admin/posts/${deleteTargetId}/delete`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                closeModal('delete-modal');
+                if (data.success) {
+                    showToast(data.message || 'Post deleted.', 'success');
+                    setTimeout(() => location.reload(), 900);
+                } else {
+                    showToast(data.message || 'Error.', 'error');
+                }
+            }).catch(() => showToast('Network error.', 'error'));
+    }
+
+    // ── Approve comment ──
+       function approveComment(id) {
+        fetch(`/admin/comments/${id}/approve`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const tag = document.getElementById('comment-tag-' + id);
+                    tag.className = 'tag approved';
+                    tag.textContent = 'Approved';
+    
+                    const card = document.getElementById('comment-' + id);
+                    card.setAttribute('data-status', 'approved');
+    
+                    const actions = document.getElementById('comment-actions-' + id);
+                    actions.innerHTML = `
+                        <button class="btn btn-outline btn-sm" onclick="unapproveComment(${id})">
+                            <i class="fa fa-rotate-left"></i> Undo
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteComment(${id})">
+                            <i class="fa fa-trash"></i>
+                        </button>`;
+    
+                    updatePendingBadge();
+                    showToast('Comment approved.', 'success');
+                } else {
+                    showToast(data.message || 'Error.', 'error');
+                }
+            }).catch(() => showToast('Network error.', 'error'));
+    }
+    
+    function unapproveComment(id) {
+        fetch(`/admin/comments/${id}/unapprove`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const tag = document.getElementById('comment-tag-' + id);
+                    tag.className = 'tag pending';
+                    tag.textContent = 'Pending';
+    
+                    const card = document.getElementById('comment-' + id);
+                    card.setAttribute('data-status', 'pending');
+    
+                    const actions = document.getElementById('comment-actions-' + id);
+                    actions.innerHTML = `
+                        <button class="btn btn-success btn-sm" onclick="approveComment(${id})">
+                            <i class="fa fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteComment(${id})">
+                            <i class="fa fa-trash"></i>
+                        </button>`;
+    
+                    updatePendingBadge();
+                    showToast('Comment unapproved.', 'info');
+                } else {
+                    showToast(data.message || 'Error.', 'error');
+                }
+            }).catch(() => showToast('Network error.', 'error'));
+    }
+
+    // ── Delete comment ──
+    function deleteComment(id) {
+        if (!confirm('Delete this comment?')) return;
+        fetch(`/admin/comments/${id}/delete`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('comment-' + id).remove();
+                    updatePendingBadge();
+                    showToast('Comment deleted.', 'success');
+                }
+            }).catch(() => showToast('Network error.', 'error'));
+    }
+
+    // ── Filter posts table ──
+    function filterTable(q) {
+        q = q.toLowerCase();
+        document.querySelectorAll('#posts-tbody tr').forEach(row => {
+            row.style.display = row.dataset.title.includes(q) ? '' : 'none';
+        });
+    }
+
+    function filterByStatus(status) {
+        document.querySelectorAll('#posts-tbody tr').forEach(row => {
+            row.style.display = (!status || row.dataset.status === status) ? '' : 'none';
+        });
+    }
+
+    // ── Filter comments ──
+    function filterComments(status) {
+        document.querySelectorAll('.comment-card').forEach(c => {
+            c.style.display = (status === 'all' || c.dataset.status === status) ? '' : 'none';
+        });
+    }
+
+    // ── Badge count ──
+    function updatePendingBadge() {
+        const n = document.querySelectorAll('.comment-card[data-status="pending"]').length;
+        document.getElementById('pending-badge').textContent = n;
+    }
+    updatePendingBadge();
+
+    // ── Toast ──
+    function showToast(msg, type = 'info') {
+        const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+        const colors = { success: 'var(--success)', error: 'var(--danger)', info: 'var(--accent-blue)' };
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<i class="fa ${icons[type]}" style="color:${colors[type]}"></i> ${msg}`;
+        document.getElementById('toasts').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    // Close modals on bg click
+    document.querySelectorAll('.modal-bg').forEach(bg => {
+        bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+    });
+
+    // Apply pending filter by default on comments
+    filterComments('pending');
+</script>
+</body>
+</html>

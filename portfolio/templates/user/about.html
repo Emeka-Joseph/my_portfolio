@@ -1,0 +1,173 @@
+{% extends "user/base.html" %}
+
+{% block title %}About Me - Lambdah Solutions{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero-gradient min-h-screen flex items-center justify-center pt-16 overflow-hidden relative">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Profile Image Section -->
+                <div class="fade-in-left order-2 md:order-1">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur-3xl opacity-30"></div>
+                        <div class="relative">
+                            <img src="{{ url_for('static', filename='images/Me.jpg') }}" 
+                                 alt="Lambdah Solutions" 
+                                 class="w-full rounded-3xl profile-glow relative z-10 border-4 border-blue-400/30"
+                                 onerror="this.src='https://placehold.co/600x800/3B82F6/ffffff?text=Lambdah'">
+                            <div class="absolute -bottom-6 -right-6 glass-strong px-6 py-4 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                    <span class="text-white font-semibold">Available for work</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Content -->
+                <div class="fade-in-right order-1 md:order-2 text-center md:text-left">
+                    <div class="inline-block glass px-4 py-2 rounded-full mb-6">
+                        <span class="text-blue-400 font-mono text-sm">👋 Hello, I'm</span>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                        Emeka Joseph
+                        <span class="block bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">Ijegalu</span>
+                    </h1>
+                    
+                    <p class="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
+                        Full-Stack Developer | Academic Researcher | Solution Architect
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4 justify-center md:justify-start mb-8">
+                        <div class="glass px-4 py-2 rounded-lg">
+                            <span class="text-blue-400 font-bold text-2xl">5+</span>
+                            <span class="text-slate-400 text-sm ml-2">Years Dev</span>
+                        </div>
+                        <div class="glass px-4 py-2 rounded-lg">
+                            <span class="text-purple-400 font-bold text-2xl">10+</span>
+                            <span class="text-slate-400 text-sm ml-2">Years Research</span>
+                        </div>
+                        <div class="glass px-4 py-2 rounded-lg">
+                            <span class="text-emerald-400 font-bold text-2xl">20+</span>
+                            <span class="text-slate-400 text-sm ml-2">Projects</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Skills Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50" id="techskills">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 text-center fade-in-up">Technical Arsenal</h2>
+            <p class="text-slate-400 text-center mb-12 text-lg fade-in-up delay-100">Mastery of modern development technologies and frameworks</p>
+
+            <!-- Backend Technologies -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold text-blue-400 mb-8 text-center">Backend Development</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    {% for skill in skills.backend %}
+                    <div class="skill-card glass p-6 rounded-xl text-center fade-in-up delay-{{ loop.index }}00">
+                        <i class="{{ skill.icon }} text-5xl text-{{ skill.color }} mb-4"></i>
+                        <h4 class="text-white font-semibold text-lg mb-2">{{ skill.name }}</h4>
+                        <div class="w-full bg-slate-700 rounded-full h-2 mb-2">
+                            <div class="progress-bar bg-gradient-to-r from-{{ skill.color }} to-blue-600 h-2 rounded-full" data-width="{{ skill.level }}"></div>
+                        </div>
+                        <span class="text-slate-400 text-sm">Expert</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Frontend Technologies -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold text-emerald-400 mb-8 text-center">Frontend Development</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    {% for skill in skills.frontend %}
+                    <div class="skill-card glass p-6 rounded-xl text-center fade-in-up delay-{{ loop.index }}00">
+                        <i class="{{ skill.icon }} text-5xl text-{{ skill.color }} mb-4"></i>
+                        <h4 class="text-white font-semibold text-lg mb-2">{{ skill.name }}</h4>
+                        <div class="w-full bg-slate-700 rounded-full h-2 mb-2">
+                            <div class="progress-bar bg-gradient-to-r from-{{ skill.color }} to-cyan-600 h-2 rounded-full" data-width="{{ skill.level }}"></div>
+                        </div>
+                        <span class="text-slate-400 text-sm">Expert</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Additional Skills -->
+            <div>
+                <h3 class="text-2xl font-bold text-purple-400 mb-8 text-center">Additional Competencies</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {% for skill in skills.additional %}
+                    <div class="skill-card glass p-6 rounded-xl text-center fade-in-up delay-{{ loop.index }}00">
+                        <i class="{{ skill.icon }} text-5xl text-{{ skill.color }} mb-4"></i>
+                        <h4 class="text-white font-semibold text-lg mb-2">{{ skill.name }}</h4>
+                        <div class="w-full bg-slate-700 rounded-full h-2 mb-2">
+                            <div class="progress-bar bg-gradient-to-r from-{{ skill.color }} to-purple-600 h-2 rounded-full" data-width="{{ skill.level }}"></div>
+                        </div>
+                        <span class="text-slate-400 text-sm">Expert</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-8 fade-in-up">My Philosophy</h2>
+            <div class="glass-strong p-8 md:p-12 rounded-2xl fade-in-up delay-200">
+                <div class="text-6xl mb-6">💡</div>
+                <p class="text-xl md:text-2xl text-slate-300 leading-relaxed mb-6 italic">
+                    "Every great innovation starts with a simple idea. My mission is to transform those ideas into powerful digital solutions that create real impact."
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-6 fade-in-up">Let's Create Something Amazing</h2>
+            <p class="text-xl text-slate-300 mb-8 fade-in-up delay-100">Ready to turn your vision into reality? Let's collaborate and build the future together.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in-up delay-200">
+                <a href="{{ url_for('index') }}#contact" class="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition transform hover:scale-105 shadow-lg shadow-blue-500/50">
+                    Start a Project
+                </a>
+                <a href="{{ url_for('index') }}#projects" class="px-8 py-4 border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-slate-900 font-semibold rounded-lg transition">
+                    View Portfolio
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Animate progress bars when in view
+    const progressBars = document.querySelectorAll('.progress-bar');
+    const progressObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const bar = entry.target;
+                const width = bar.dataset.width;
+                setTimeout(() => {
+                    bar.style.width = width + '%';
+                }, 200);
+                progressObserver.unobserve(bar);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    progressBars.forEach(bar => {
+        progressObserver.observe(bar);
+    });
+</script>
+{% endblock %}

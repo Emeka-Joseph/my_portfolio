@@ -1,0 +1,530 @@
+{% extends "user/base.html" %}
+
+{% block title %}Create Blog Post - AI Assistant - Lambdah Solutions{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="hero-gradient pt-32 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 fade-in">
+            <span class="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                AI-Powered Blog Creator
+            </span>
+        </h1>
+        <p class="text-xl text-slate-300 fade-in">
+            Create amazing blog posts with AI assistance
+        </p>
+    </div>
+</section>
+
+<!-- Creator Interface -->
+<section class="py-12 bg-slate-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- AI Assistant Panel -->
+            <div class="lg:col-span-1">
+                <div class="glass-strong rounded-xl p-6 sticky top-24">
+                    <h2 class="text-2xl font-bold text-white mb-6">
+                        <i class="fas fa-robot text-blue-400 mr-2"></i>
+                        AI Assistant
+                    </h2>
+                    
+                    <!-- Generate Titles -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-white mb-3">1. Generate Title Ideas</h3>
+                        <input type="text" 
+                               id="topic-input" 
+                               placeholder="Enter topic (e.g., Flask REST APIs)"
+                               class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition mb-3">
+                        <button onclick="generateTitles()" 
+                                class="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-magic"></i> Generate Titles
+                            <span id="title-spinner" class="spinner hidden"></span>
+                        </button>
+                        <div id="title-results" class="mt-4 hidden">
+                            <div class="bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto">
+                                <pre id="title-text" class="text-sm text-slate-300 whitespace-pre-wrap"></pre>
+                            </div>
+                            <button onclick="useTitleFromAI()" 
+                                    class="w-full mt-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition">
+                                Use Selected Title
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Generate Outline -->
+                    <div class="mb-6 pb-6 border-b border-slate-700">
+                        <h3 class="text-lg font-semibold text-white mb-3">2. Generate Outline</h3>
+                        <button onclick="generateOutline()" 
+                                class="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-list"></i> Generate Outline
+                            <span id="outline-spinner" class="spinner hidden"></span>
+                        </button>
+                        <div id="outline-results" class="mt-4 hidden">
+                            <div class="bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto">
+                                <pre id="outline-text" class="text-sm text-slate-300 whitespace-pre-wrap"></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Expand Section -->
+                    <div class="mb-6 pb-6 border-b border-slate-700">
+                        <h3 class="text-lg font-semibold text-white mb-3">3. Expand Content</h3>
+                        <textarea id="section-input" 
+                                  rows="3" 
+                                  placeholder="Enter section heading to expand..."
+                                  class="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition resize-none mb-3"></textarea>
+                        <button onclick="expandSection()" 
+                                class="w-full px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-expand"></i> Expand Section
+                            <span id="expand-spinner" class="spinner hidden"></span>
+                        </button>
+                        <div id="expand-results" class="mt-4 hidden">
+                            <div class="bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto">
+                                <p id="expand-text" class="text-sm text-slate-300"></p>
+                            </div>
+                            <button onclick="appendToContent()" 
+                                    class="w-full mt-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition">
+                                Add to Content
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Improve Content -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-3">4. Improve Text</h3>
+                        <p class="text-sm text-slate-400 mb-3">Select text in editor, then click:</p>
+                        <button onclick="improveContent()" 
+                                class="w-full px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-wand-magic-sparkles"></i> Improve Selected
+                            <span id="improve-spinner" class="spinner hidden"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Editor Panel -->
+            <div class="lg:col-span-2">
+                <form id="blog-form" class="glass-strong rounded-xl p-8" enctype="multipart/form-data">
+                    <h2 class="text-2xl font-bold text-white mb-6">
+                        <i class="fas fa-edit text-blue-400 mr-2"></i>
+                        Blog Post Editor
+                    </h2>
+                    
+                    <!-- Title -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">
+                            Title *
+                        </label>
+                        <input type="text" 
+                               id="post-title" 
+                               required
+                               placeholder="Enter your blog post title..."
+                               class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition">
+                    </div>
+                    
+                    <!-- Featured Image Upload -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">
+                            <i class="fas fa-image mr-1"></i> Featured Image
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   id="featured-image" 
+                                   name="featured_image"
+                                   accept="image/*"
+                                   class="hidden"
+                                   onchange="previewImage(event)">
+                            <label for="featured-image" 
+                                   class="flex items-center justify-center w-full px-4 py-3 bg-slate-800 border-2 border-dashed border-slate-700 rounded-lg text-slate-400 hover:border-blue-400 hover:text-blue-400 cursor-pointer transition">
+                                <div class="text-center">
+                                    <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                                    <p class="text-sm">Click to upload or drag and drop</p>
+                                    <p class="text-xs text-slate-500 mt-1">PNG, JPG, WEBP up to 5MB</p>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- Image Preview -->
+                        <div id="image-preview" class="hidden mt-4">
+                            <div class="relative rounded-lg overflow-hidden border border-slate-700">
+                                <img id="preview-img" src="" alt="Preview" class="w-full h-64 object-cover">
+                                <button type="button" 
+                                        onclick="removeImage()" 
+                                        class="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <p id="image-name" class="text-sm text-slate-400 mt-2"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Category and Tags Row -->
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-300 mb-2">
+                                Category
+                            </label>
+                            <select id="post-category" 
+                                    class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition">
+                                <option value="">Select category...</option>
+                                <option value="web-development">Web Development</option>
+                                <option value="ai-ml">AI & Machine Learning</option>
+                                <option value="finance">Finance</option>
+                                <option value="leadership">Leadership</option>
+                                <option value="motivation">Motivation</option>
+                                <option value="success">Success</option>
+                                <option value="productivity">Productivity</option>
+                                <option value="talent">Talent and Gifts</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-300 mb-2">
+                                Tags (comma-separated)
+                            </label>
+                            <input type="text" 
+                                   id="post-tags" 
+                                   placeholder="flask, python, api"
+                                   class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition">
+                        </div>
+                    </div>
+                    
+                    <!-- Excerpt -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">
+                            Excerpt (Short Description)
+                        </label>
+                        <textarea id="post-excerpt" 
+                                  rows="2" 
+                                  placeholder="Brief summary of your post..."
+                                  class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition resize-none"></textarea>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">
+                            Content * (Supports HTML)
+                        </label>
+                        <textarea id="post-content" 
+                                  rows="20" 
+                                  required
+                                  placeholder="Write your blog post content here... You can use HTML tags for formatting."
+                                  class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition resize-none font-mono text-sm"></textarea>
+                        <p class="text-xs text-slate-500 mt-2">
+                            Tip: Use HTML tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;code&gt; for formatting
+                        </p>
+                    </div>
+                    
+                    <!-- Preview Button -->
+                    <div class="mb-6">
+                        <button type="button" 
+                                onclick="togglePreview()" 
+                                class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">
+                            <i class="fas fa-eye mr-2"></i>Toggle Preview
+                        </button>
+                    </div>
+                    
+                    <!-- Preview Area -->
+                    <div id="preview-area" class="hidden mb-6 p-6 bg-slate-800 rounded-lg border border-slate-700">
+                        <h3 class="text-lg font-bold text-white mb-4">Preview:</h3>
+                        <div id="preview-content" class="prose prose-invert max-w-none"></div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="flex gap-4">
+                        <button type="submit" 
+                                class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fas fa-paper-plane"></i>
+                            <span id="submit-text">Publish Post</span>
+                            <span id="submit-spinner" class="spinner hidden"></span>
+                        </button>
+                        <a href="{{ url_for('blog_list') }}" 
+                           class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition">
+                            Cancel
+                        </a>
+                    </div>
+                    
+                    <!-- Success/Error Message -->
+                    <div id="form-message" class="hidden mt-6 p-4 rounded-lg"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Image Preview Function
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // Check file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            event.target.value = '';
+            return;
+        }
+        
+        // Check file type
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file');
+            event.target.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('image-name').textContent = file.name;
+            document.getElementById('image-preview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Remove Image Function
+function removeImage() {
+    document.getElementById('featured-image').value = '';
+    document.getElementById('image-preview').classList.add('hidden');
+}
+
+// AI Functions
+async function generateTitles() {
+    const topic = document.getElementById('topic-input').value.trim();
+    if (!topic) {
+        alert('Please enter a topic');
+        return;
+    }
+    
+    const spinner = document.getElementById('title-spinner');
+    const results = document.getElementById('title-results');
+    const text = document.getElementById('title-text');
+    
+    spinner.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/api/ai/generate-titles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            text.textContent = data.titles;
+            results.classList.remove('hidden');
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Failed to generate titles');
+    } finally {
+        spinner.classList.add('hidden');
+    }
+}
+
+function useTitleFromAI() {
+    const titleText = document.getElementById('title-text').textContent;
+    const firstTitle = titleText.split('\n').find(line => line.trim().length > 0);
+    if (firstTitle) {
+        const cleanTitle = firstTitle.replace(/^\d+\.\s*/, '').trim();
+        document.getElementById('post-title').value = cleanTitle;
+    }
+}
+
+async function generateOutline() {
+    const title = document.getElementById('post-title').value.trim();
+    if (!title) {
+        alert('Please enter a title first');
+        return;
+    }
+    
+    const spinner = document.getElementById('outline-spinner');
+    const results = document.getElementById('outline-results');
+    const text = document.getElementById('outline-text');
+    
+    spinner.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/api/ai/generate-outline', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            text.textContent = data.outline;
+            results.classList.remove('hidden');
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Failed to generate outline');
+    } finally {
+        spinner.classList.add('hidden');
+    }
+}
+
+async function expandSection() {
+    const section = document.getElementById('section-input').value.trim();
+    if (!section) {
+        alert('Please enter a section to expand');
+        return;
+    }
+    
+    const spinner = document.getElementById('expand-spinner');
+    const results = document.getElementById('expand-results');
+    const text = document.getElementById('expand-text');
+    
+    spinner.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/api/ai/expand-section', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                section,
+                context: document.getElementById('post-title').value 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            text.textContent = data.content;
+            results.classList.remove('hidden');
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Failed to expand section');
+    } finally {
+        spinner.classList.add('hidden');
+    }
+}
+
+function appendToContent() {
+    const expandText = document.getElementById('expand-text').textContent;
+    const contentArea = document.getElementById('post-content');
+    contentArea.value += '\n\n' + expandText;
+}
+
+async function improveContent() {
+    const contentArea = document.getElementById('post-content');
+    const selectedText = contentArea.value.substring(
+        contentArea.selectionStart,
+        contentArea.selectionEnd
+    );
+    
+    if (!selectedText) {
+        alert('Please select some text to improve');
+        return;
+    }
+    
+    const spinner = document.getElementById('improve-spinner');
+    spinner.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/api/ai/improve-content', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: selectedText })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const start = contentArea.selectionStart;
+            const end = contentArea.selectionEnd;
+            const before = contentArea.value.substring(0, start);
+            const after = contentArea.value.substring(end);
+            contentArea.value = before + data.improved + after;
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Failed to improve content');
+    } finally {
+        spinner.classList.add('hidden');
+    }
+}
+
+// Preview Toggle
+function togglePreview() {
+    const preview = document.getElementById('preview-area');
+    const content = document.getElementById('post-content').value;
+    const previewContent = document.getElementById('preview-content');
+    
+    if (preview.classList.contains('hidden')) {
+        previewContent.innerHTML = content;
+        preview.classList.remove('hidden');
+    } else {
+        preview.classList.add('hidden');
+    }
+}
+
+// Form Submission with Image Upload
+document.getElementById('blog-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const submitText = document.getElementById('submit-text');
+    const submitSpinner = document.getElementById('submit-spinner');
+    const messageDiv = document.getElementById('form-message');
+    
+    // Create FormData object to handle file upload
+    const formData = new FormData();
+    formData.append('title', document.getElementById('post-title').value);
+    formData.append('content', document.getElementById('post-content').value);
+    formData.append('excerpt', document.getElementById('post-excerpt').value);
+    formData.append('category', document.getElementById('post-category').value);
+    formData.append('tags', document.getElementById('post-tags').value);
+    
+    // Add image if selected
+    const imageFile = document.getElementById('featured-image').files[0];
+    if (imageFile) {
+        formData.append('featured_image', imageFile);
+    }
+    
+    submitBtn.disabled = true;
+    submitText.textContent = 'Publishing...';
+    submitSpinner.classList.remove('hidden');
+    
+    try {
+        const response = await fetch('/blog/create', {
+            method: 'POST',
+            body: formData  // Send FormData instead of JSON
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            messageDiv.className = 'mt-6 p-4 bg-green-500/20 border border-green-500 text-green-300 rounded-lg';
+            messageDiv.textContent = result.message;
+            messageDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                window.location.href = `/blog/${result.slug}`;
+            }, 1500);
+        } else {
+            messageDiv.className = 'mt-6 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-lg';
+            messageDiv.textContent = result.error || 'Failed to create post';
+            messageDiv.classList.remove('hidden');
+        }
+    } catch (error) {
+        messageDiv.className = 'mt-6 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-lg';
+        messageDiv.textContent = 'An error occurred. Please try again.';
+        messageDiv.classList.remove('hidden');
+    } finally {
+        submitBtn.disabled = false;
+        submitText.textContent = 'Publish Post';
+        submitSpinner.classList.add('hidden');
+    }
+});
+</script>
+{% endblock %}

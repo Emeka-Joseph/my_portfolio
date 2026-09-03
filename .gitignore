@@ -1,0 +1,37 @@
+# ── Secrets — never commit ──────────────────────────────
+# instance/config.py holds the DB password, mail password and OpenAI key
+instance/
+# live Anthropic API key
+claude_api_key.txt
+.env
+*.pem
+*.key
+
+# ── Database dumps (contain admin credentials + user data) ──
+*.sql
+
+# ── Logs ────────────────────────────────────────────────
+*.log
+
+# ── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+
+# ── Passenger / cPanel runtime ──────────────────────────
+tmp/
+
+# ── Deployment artifacts ────────────────────────────────
+*.zip
+
+# ── User-uploaded content ───────────────────────────────
+portfolio/static/uploads/
+static/uploads/
+
+# ── Editor / OS ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

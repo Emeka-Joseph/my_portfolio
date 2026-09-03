@@ -1,0 +1,513 @@
+{% extends "user/base.html" %}
+
+{% block title %}{{ post.title }} - Lambdah Solutions{% endblock %}
+
+{% block meta_description %}{{ post.excerpt if post.excerpt else post.title }}{% endblock %}
+
+{% block og_tags %}
+<meta property="og:type"        content="article">
+<meta property="og:url"         content="{{ request.url }}">
+<meta property="og:title"       content="{{ post.title }}">
+<meta property="og:description" content="{{ post.excerpt if post.excerpt else post.content | striptags | truncate(900) }}">
+<meta property="og:image"       content="{{ post.featured_image if post.featured_image else url_for('static', filename='img/og-default.jpg', _external=True) }}">
+<meta property="og:site_name"   content="Lambdah Softwares">
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="{{ post.title }}">
+<meta name="twitter:description" content="{{ post.excerpt if post.excerpt else post.content | striptags | truncate(900) }}">
+<meta name="twitter:image"       content="{{ post.featured_image if post.featured_image else url_for('static', filename='img/og-default.jpg', _external=True) }}">
+{% endblock %}
+
+{% block content %}
+<!-- Article Header -->
+<section class="hero-gradient pt-32 pb-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if post.category %}
+        <a href="{{ url_for('blog_list', category=post.category) }}" 
+           class="inline-block px-4 py-2 bg-blue-500/20 text-blue-400 rounded-full mb-4 hover:bg-blue-500/30 transition capitalize">
+            {{ post.category }}
+        </a>
+        {% endif %}
+        <h1 class="text-3xl md:text-5xl font-bold text-white mb-6 fade-in leading-tight">
+            {{ post.title }}
+        </h1>
+        <div class="flex flex-wrap items-center gap-6 text-slate-300 fade-in">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-user"></i>
+                <span>{{ post.author }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="far fa-calendar"></i>
+                <span>{{ post.created_at.strftime('%B %d, %Y') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="far fa-eye"></i>
+                <span>{{ post.views }} views</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="far fa-comments"></i>
+                <span>{{ comments|length }} comments</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Article Content -->
+<section class="py-12 bg-slate-900">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {% if post.featured_image %}
+        <div class="rounded-xl overflow-hidden mb-8 fade-in-up shadow-2xl">
+            <img src="{{ post.featured_image }}" alt="{{ post.title }}" class="w-full h-96 object-cover">
+        </div>
+        {% endif %}
+        
+        <article class="glass-strong rounded-xl p-6 md:p-8 mb-12 fade-in-up">
+            {% if post.excerpt %}
+            <div class="text-xl text-slate-300 mb-8 pb-8 border-b border-slate-700 bolder leading-relaxed">
+                {{ post.excerpt }}
+            </div>
+            {% endif %}
+            
+            <div class="prose prose-invert prose-lg max-w-none">
+                {{ post.content|safe }}
+            </div>
+            
+            
+             <!-- ═══════════════════════════════════════════════
+                 SHARE SECTION — popup panel replacing flat icons
+                 ═══════════════════════════════════════════════ -->
+            <div class="mt-8 pt-8 border-t border-slate-700">
+                <h4 class="text-sm font-semibold text-slate-400 mb-3">Share this article:</h4>
+
+               <!-- Trigger button -->
+                <div class="relative inline-block">
+                    <button id="shareBtn"
+                            onclick="toggleSharePanel(event)"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-lg border border-slate-700 transition-all hover:border-blue-500 group">
+                        <i class="fas fa-share-nodes text-blue-400 group-hover:scale-110 transition-transform"></i>
+                        Share
+                        <i class="fas fa-chevron-down text-slate-500 text-xs" id="shareChevron"></i>
+                    </button>
+
+                    <!-- Popup panel -->
+                    <div id="sharePanel"
+                         class="share-popup absolute left-0 mt-2 z-50 hidden">
+                        <p class="share-popup-label">Share via</p>
+                        <div class="share-popup-grid">
+
+                            <!-- Facebook -->
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url|urlencode }}"
+                               target="_blank" rel="noopener"
+                               class="share-btn share-fb" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                                <span>Facebook</span>
+                            </a>
+
+                            <!-- X / Twitter -->
+                            <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ request.url|urlencode }}"
+                               target="_blank" rel="noopener"
+                               class="share-btn share-x" title="X / Twitter">
+                                <i class="fab fa-x-twitter"></i>
+                                <span>X / Twitter</span>
+                            </a>
+
+                            <!-- WhatsApp -->
+                            <a href="https://wa.me/?text={{ post.title|urlencode }}%20{{ request.url|urlencode }}"
+                               target="_blank" rel="noopener"
+                               class="share-btn share-wa" title="WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                            </a>
+
+                            <!-- LinkedIn -->
+                            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url|urlencode }}"
+                               target="_blank" rel="noopener"
+                               class="share-btn share-li" title="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                                <span>LinkedIn</span>
+                            </a>
+
+                            <!-- Email -->
+                            <a href="mailto:?subject={{ post.title|urlencode }}&body={{ request.url|urlencode }}"
+                               class="share-btn share-mail" title="Email">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email</span>
+                            </a>
+
+                            <!-- Copy Link -->
+                            <button onclick="copyArticleLink()" class="share-btn share-copy" title="Copy link">
+                                <i class="fas fa-link" id="copyIcon"></i>
+                                <span id="copyLabel">Copy link</span>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- end share -->
+            </div>
+             
+            
+            {% if post.tags %}
+            <div class="mt-8 pt-8 border-t border-slate-700">
+                <h4 class="text-sm font-semibold text-slate-400 mb-3">Tags:</h4>
+                <div class="flex flex-wrap gap-2">
+                    {% for tag in post.tags.split(',') %}
+                    <span class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-full text-sm transition cursor-pointer">
+                        #{{ tag.strip() }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+           
+        </article>
+        
+        <!-- Comments Section -->
+        <div class="glass-strong rounded-xl p-6 md:p-8 mb-12">
+            <h3 class="text-2xl font-bold text-white mb-6">
+                <i class="far fa-comments text-blue-400 mr-2"></i>
+                Comments ({{ comments|length }})
+            </h3>
+            
+            <form id="comment-form" class="mb-8 pb-8 border-b border-slate-700">
+                <h4 class="text-lg font-semibold text-white mb-4">Leave a Comment</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="comment-name" placeholder="Your Name *" required
+                           class="px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none transition">
+                    <input type="email" id="comment-email" placeholder="Your Email *" required
+                           class="px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none transition">
+                </div>
+                <textarea id="comment-text" rows="4" placeholder="Your Comment *" required
+                          class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-blue-400 focus:outline-none transition resize-none mb-4"></textarea>
+                <button type="submit"
+                        class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-paper-plane"></i>
+                    Post Comment
+                </button>
+                <div id="comment-message" class="hidden mt-4 p-4 rounded-lg"></div>
+            </form>
+            
+            <div class="space-y-6">
+                {% if comments %}
+                    {% for comment in comments %}
+                    <div class="bg-slate-800/50 rounded-lg p-6 hover:bg-slate-800/70 transition">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                    {{ comment.name[0].upper() }}
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h4 class="font-semibold text-white">{{ comment.name }}</h4>
+                                    <span class="text-sm text-slate-400">•</span>
+                                    <p class="text-sm text-slate-400">{{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                </div>
+                                <p class="text-slate-300 leading-relaxed">{{ comment.comment }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="far fa-comments text-6xl text-slate-700 mb-4"></i>
+                        <p class="text-slate-400 text-lg">No comments yet. Be the first to comment!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        
+        
+        {% if related_posts %}
+        <div class="mb-12">
+            <h3 class="text-2xl font-bold text-white mb-6">
+                <i class="fas fa-newspaper text-blue-400 mr-2"></i>
+                Related Articles
+            </h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                {% for related in related_posts %}
+                <a href="{{ url_for('blog_detail', slug=related.slug) }}" 
+                   class="glass rounded-xl overflow-hidden group hover:transform hover:scale-105 transition-all duration-300">
+                    <div class="h-40 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 overflow-hidden">
+                        {% if related.featured_image %}
+                        <img src="{{ related.featured_image }}" alt="{{ related.title }}" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-blog text-5xl text-blue-400/30"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-4">
+                        {% if related.category %}
+                        <span class="inline-block px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full mb-2 capitalize">
+                            {{ related.category }}
+                        </span>
+                        {% endif %}
+                        <h4 class="font-semibold text-white group-hover:text-blue-400 transition line-clamp-2 mb-2">
+                            {{ related.title }}
+                        </h4>
+                        <p class="text-sm text-slate-400">
+                            <i class="far fa-calendar mr-1"></i>
+                            {{ related.created_at.strftime('%b %d, %Y') }}
+                        </p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <a href="{{ url_for('blog_list') }}" 
+               class="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition">
+                <i class="fas fa-arrow-left"></i> Back to All Posts
+            </a>
+            {% if username %}
+            <a href="{{ url_for('blog_create') }}" 
+               class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-lg transition">
+                <i class="fas fa-plus"></i> Write a Post
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+{% block extra_styles %}
+<style>
+    /* ── Prose ── */
+    .prose { color: #cbd5e1; line-height: 1.75; }
+    .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 { color:#fff; font-weight:700; margin-top:2rem; margin-bottom:1rem; line-height:1.3; }
+    .prose h2 { font-size:1.875rem; border-bottom:2px solid #334155; padding-bottom:.5rem; }
+    .prose h3 { font-size:1.5rem; }
+    .prose h4 { font-size:1.25rem; }
+    .prose p  { margin-bottom:1.25rem; line-height:1.75; }
+    .prose ul, .prose ol { margin:1.25rem 0; padding-left:2rem; }
+    .prose ul  { list-style-type:disc; }
+    .prose ol  { list-style-type:decimal; }
+    .prose li  { margin-bottom:.5rem; line-height:1.75; }
+    .prose li::marker { color:#60a5fa; }
+    .prose a   { color:#60a5fa; text-decoration:underline; transition:color .2s; }
+    .prose a:hover { color:#93c5fd; }
+    .prose strong { color:#fff; font-weight:600; }
+    .prose em  { font-style:italic; color:#94a3b8; }
+    .prose code { background:#1e293b; color:#38bdf8; padding:.25rem .5rem; border-radius:.25rem; font-size:.875rem; font-family:'JetBrains Mono',monospace; }
+    .prose pre  { background:#1e293b; padding:1.5rem; border-radius:.5rem; overflow-x:auto; margin:1.5rem 0; border:1px solid #334155; }
+    .prose pre code { background:transparent; padding:0; color:#cbd5e1; }
+    .prose blockquote { border-left:4px solid #3b82f6; padding:1rem 1.5rem; font-style:italic; color:#94a3b8; margin:1.5rem 0; background:#1e293b; border-radius:.5rem; }
+    .prose img { border-radius:.5rem; margin:2rem 0; width:100%; height:auto; }
+    .prose hr  { border:none; border-top:2px solid #334155; margin:2rem 0; }
+    .prose table { width:100%; border-collapse:collapse; margin:1.5rem 0; }
+    .prose th, .prose td { border:1px solid #334155; padding:.75rem; text-align:left; }
+    .prose th { background:#1e293b; color:#fff; font-weight:600; }
+    .prose td { background:#0f172a; }
+
+    .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+    /* ══════════════════════════════════
+       Share popup
+       ══════════════════════════════════ */
+    .share-popup {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 14px;
+        padding: 16px;
+        width: 280px;
+        box-shadow: 0 20px 40px rgba(0,0,0,.5);
+        animation: popIn .18s ease;
+    }
+    @keyframes popIn {
+        from { opacity:0; transform:translateY(-6px) scale(.97); }
+        to   { opacity:1; transform:translateY(0)   scale(1);    }
+    }
+
+    .share-popup-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 12px;
+    }
+
+    .share-popup-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .share-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 10px 6px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: #cbd5e1;
+        font-size: 18px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform .18s, background .18s, color .18s, border-color .18s;
+    }
+    .share-btn span {
+        font-size: 10px;
+        color: #64748b;
+        white-space: nowrap;
+    }
+    .share-btn:hover { transform: scale(1.08); }
+
+    .share-fb:hover   { background:#1877f2; color:#fff; border-color:#1877f2; }
+    .share-fb:hover span { color:rgba(255,255,255,.8); }
+
+    .share-x:hover    { background:#000; color:#fff; border-color:#555; }
+    .share-x:hover span { color:rgba(255,255,255,.7); }
+
+    .share-wa:hover   { background:#25d366; color:#fff; border-color:#25d366; }
+    .share-wa:hover span { color:rgba(255,255,255,.8); }
+
+    .share-li:hover   { background:#0077b5; color:#fff; border-color:#0077b5; }
+    .share-li:hover span { color:rgba(255,255,255,.8); }
+
+    .share-mail:hover { background:#ea4335; color:#fff; border-color:#ea4335; }
+    .share-mail:hover span { color:rgba(255,255,255,.8); }
+
+    .share-copy:hover { background:#22c55e; color:#fff; border-color:#22c55e; }
+    .share-copy:hover span { color:rgba(255,255,255,.8); }
+
+    /* copied state */
+    .share-copy.copied { background:#22c55e; color:#fff; border-color:#22c55e; }
+    .share-copy.copied span { color:rgba(255,255,255,.9); }
+    
+    
+    
+    
+    /*for the post*/
+
+    .post-eyebrow { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.7; }
+.post-title   { font-size: 2.4rem; font-weight: 900; margin-bottom: 1rem; }
+.post-lede    { font-size: 1.2rem; font-style: italic; line-height: 1.7; }
+.post-divider { border: none; border-top: 1px solid rgba(0,0,0,0.15); margin: 2rem 0; }
+
+blockquote          { border-left: 3px solid #c9a84c; padding: 1rem 1.4rem; margin: 2rem 0; background: rgba(0,0,0,0.03); }
+blockquote h3       { font-size: 0.95rem; margin-bottom: 0.5rem; }
+blockquote cite     { display: block; margin-top: 0.7rem; font-size: 0.85rem; opacity: 0.6; }
+.blockquote-label   { font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; opacity: 0.6; margin-bottom: 4px; }
+
+.post-key-truth     { text-align: center; padding: 1.5rem 2rem; border: 1px solid rgba(201,168,76,0.3); margin: 2rem 0; }
+.post-key-truth p   { font-size: 1.1rem; font-style: italic; line-height: 1.7; }
+.post-closing       { text-align: center; font-style: italic; line-height: 1.9; }
+</style>
+{% endblock %}
+
+
+{% block extra_scripts %}
+<script>
+/* ── Share panel toggle ── */
+function toggleSharePanel(e) {
+    e.stopPropagation();
+    const panel    = document.getElementById('sharePanel');
+    const chevron  = document.getElementById('shareChevron');
+    const isHidden = panel.classList.contains('hidden');
+
+    panel.classList.toggle('hidden', !isHidden);
+    chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0)';
+    chevron.style.transition = 'transform .2s';
+}
+
+/* Close when clicking anywhere outside */
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('sharePanel');
+    const btn   = document.getElementById('shareBtn');
+    if (!panel || panel.classList.contains('hidden')) return;
+    if (!panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.classList.add('hidden');
+        document.getElementById('shareChevron').style.transform = 'rotate(0)';
+    }
+});
+
+/* ── Copy link ── */
+function copyArticleLink() {
+    const url     = window.location.href;
+    const btn     = document.querySelector('.share-copy');
+    const icon    = document.getElementById('copyIcon');
+    const label   = document.getElementById('copyLabel');
+
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        icon.className  = 'fas fa-check';
+        label.textContent = 'Copied!';
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            icon.className  = 'fas fa-link';
+            label.textContent = 'Copy link';
+        }, 2500);
+    }).catch(() => {
+        /* Fallback */
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.cssText = 'position:fixed;left:-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        label.textContent = 'Copied!';
+        setTimeout(() => label.textContent = 'Copy link', 2500);
+    });
+}
+
+/* ── Comment form ── */
+document.getElementById('comment-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name    = document.getElementById('comment-name').value.trim();
+    const email   = document.getElementById('comment-email').value.trim();
+    const comment = document.getElementById('comment-text').value.trim();
+    const msgDiv  = document.getElementById('comment-message');
+    const btn     = e.target.querySelector('button[type="submit"]');
+
+    if (!name || !email || !comment) {
+        msgDiv.className   = 'mt-4 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-lg';
+        msgDiv.textContent = 'Please fill in all fields';
+        msgDiv.classList.remove('hidden');
+        return;
+    }
+
+    btn.disabled   = true;
+    btn.innerHTML  = '<i class="fas fa-spinner fa-spin mr-2"></i>Posting...';
+
+    try {
+        const res    = await fetch('/api/blog/comment', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ post_id: {{ post.id }}, name, email, comment })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            msgDiv.className   = 'mt-4 p-4 bg-green-500/20 border border-green-500 text-green-300 rounded-lg';
+            msgDiv.textContent = result.message;
+            msgDiv.classList.remove('hidden');
+            e.target.reset();
+            setTimeout(() => msgDiv.classList.add('hidden'), 5000);
+        } else {
+            msgDiv.className   = 'mt-4 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-lg';
+            msgDiv.textContent = result.error || 'Failed to post comment';
+            msgDiv.classList.remove('hidden');
+        }
+    } catch (err) {
+        msgDiv.className   = 'mt-4 p-4 bg-red-500/20 border border-red-500 text-red-300 rounded-lg';
+        msgDiv.textContent = 'An error occurred. Please try again.';
+        msgDiv.classList.remove('hidden');
+    } finally {
+        btn.disabled  = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Comment';
+    }
+});
+</script>
+{% endblock %}

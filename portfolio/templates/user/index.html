@@ -1,0 +1,281 @@
+{% extends "user/base.html" %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient min-h-screen flex items-center justify-center pt-16 overflow-hidden relative">
+        <!-- Floating Shapes -->
+        <div class="absolute top-20 right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl float-shape"></div>
+        <div class="absolute bottom-0 left-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl float-shape-2"></div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <!-- Avatar -->
+            <div class="mb-8 flex justify-center">
+                <div class="relative">
+                    <img src="{{ url_for('static', filename='images/Me.jpg') }}" alt="Profile" class="w-32 h-32 rounded-full border-4 border-blue-400 shadow-lg shadow-blue-500/50" onerror="this.src='https://placehold.co/200x200/3B82F6/ffffff?text=LS'">
+                    <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-400 border-r-blue-400 animate-spin" style="animation-duration: 3s;"></div>
+                </div>
+            </div>
+
+            <!-- Main Headline -->
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 fade-in">
+                Full-Stack Developer
+            </h1>
+
+            <!-- Typing Animation -->
+            <p class="text-lg sm:text-xl text-blue-400 mb-6 font-mono h-8">
+                <span id="typing-text">Crafting Elegant Solutions</span>
+            </p>
+
+            <!-- Bio -->
+            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto mb-8">
+                I transform complex ideas into elegant digital solutions. Specializing in backend architecture with Python and modern frontend experiences with React, I build scalable, user-centric applications that make an impact.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <a href="#projects" class="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition transform hover:scale-105 shadow-lg shadow-blue-500/50">
+                    View My Work
+                </a>
+                <button onclick="downloadResume()" class="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg transition border border-slate-700 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download Resume
+                </button>
+                <a href="#contact" class="px-8 py-3 border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-slate-900 font-semibold rounded-lg transition">
+                    Let's Connect
+                </a>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="flex justify-center items-center gap-2 text-slate-400 animate-bounce">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-12 text-center">Who I Am & What I Do</h2>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+                <!-- Text Content -->
+                <div class="space-y-6">
+                    <p class="text-slate-300 text-lg leading-relaxed">
+                        With over half a decade experience in full-stack web development, I specialize in building robust backend systems and intuitive frontend interfaces that synchronizes seamlessly to satisfy the customer's needs.
+                    </p>
+                    <p class="text-slate-300 text-lg leading-relaxed">
+                        My approach centers on clean, maintainable code and user-centric design, which proves that great software is the intersection of technical excellence and practical user needs.
+                    </p>
+                    <p class="text-slate-300 text-lg leading-relaxed">
+                        I'm passionate about solving complex problems, optimizing performance, staying abreast of web technologies and taking every project as an opportunity to create something unique.
+                    </p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 gap-6">
+                    {% for stat in stats %}
+                    <div class="glass p-6 rounded-xl text-center stagger-item">
+                        <div class="counter text-3xl md:text-4xl" data-target="{{ stat.value }}">0</div>
+                        <p class="text-slate-400 mt-2">{{ stat.label }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-12 text-center">Featured Projects</h2>
+
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap gap-3 justify-center mb-12">
+                <button class="filter-btn px-6 py-2 bg-blue-500 text-white rounded-full font-semibold transition hover:bg-blue-600" data-filter="all">All Projects</button>
+                <button class="filter-btn px-6 py-2 bg-slate-800 text-slate-300 rounded-full font-semibold transition hover:bg-blue-500 hover:text-white" data-filter="python">Python</button>
+                <button class="filter-btn px-6 py-2 bg-slate-800 text-slate-300 rounded-full font-semibold transition hover:bg-blue-500 hover:text-white" data-filter="react">React</button>
+                <button class="filter-btn px-6 py-2 bg-slate-800 text-slate-300 rounded-full font-semibold transition hover:bg-blue-500 hover:text-white" data-filter="fullstack">Full-Stack</button>
+            </div>
+
+            <!-- Projects Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for project in projects %}
+                <div class="project-card glass rounded-xl overflow-hidden stagger-item" data-tags="{{ project.category|join(' ') }}">
+                    <img src="{{ url_for('static', filename='images/' + project.image) }}" alt="{{ project.title }}" class="w-full h-48 object-cover" onerror="this.src='https://placehold.co/400x250/3B82F6/1E293B?text={{ project.title }}'">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-white mb-2">{{ project.title }}</h3>
+                        <p class="text-slate-400 text-sm mb-4">{{ project.description }}</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            {% for tag in project.tags %}
+                            <span class="text-xs bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="flex gap-3">
+                            {% if project.demo_url %}
+                            <a href="{{ project.demo_url }}" target="_blank" class="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg transition text-center">Live Demo</a>
+                            {% endif %}
+                            {% if project.code_url %}
+                            <a href="{{ project.code_url }}" target="_blank" class="flex-1 px-4 py-2 border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-slate-900 text-sm font-semibold rounded-lg transition text-center">Code</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 px-4 sm:px-6 lg:px-8 bg-slate-900/50">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-12 text-center">Professional Experience</h2>
+
+            <div class="space-y-8">
+                <!-- Experience -->
+                <div class="glass p-6 md:p-8 rounded-xl border-l-4 border-emerald-500 stagger-item">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-emerald-400">Full-Stack Developer</h3>
+                            <p class="text-slate-300">Lambdah Softwares Solution</p>
+                        </div>
+                        <span class="text-slate-400 whitespace-nowrap">2019 - Present</span>
+                    </div>
+                    <ul class="space-y-2 text-slate-300">
+                        <li class="flex gap-3">
+                            <span class="text-emerald-400 mt-1">→</span>
+                            <span>Developed 12+ production web applications using Python-Flask, php and React</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-emerald-400 mt-1">→</span>
+                            <span>Optimized database queries reducing average response time from 800ms to 120ms</span>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="text-emerald-400 mt-1">→</span>
+                            <span>Implemented different secured payment platforms such as Paypal, Stripe payments, Paystack etc which made various project handle payments activities seamlessly</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 text-center">Let's Build Something Amazing</h2>
+            <p class="text-slate-300 text-center mb-12 text-lg">Have a project in mind? Let's collaborate and bring your ideas to life.</p>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Contact Info -->
+                <div class="space-y-8">
+                    <div class="glass p-6 rounded-xl">
+                        <h3 class="text-2xl font-semibold text-white mb-6">Get In Touch</h3>
+                        
+                        <div class="space-y-6">
+                            <!-- Email -->
+                            <div class="flex gap-4 items-start">
+                                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-envelope text-blue-400 text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400 text-sm">Email</p>
+                                    <p class="text-white font-semibold">{{ contact.email }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="flex gap-4 items-start">
+                                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-phone text-blue-400 text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400 text-sm">Phone</p>
+                                    <p class="text-white font-semibold">{{ contact.phone }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="flex gap-4 items-start">
+                                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt text-blue-400 text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-slate-400 text-sm">Location</p>
+                                    <p class="text-white font-semibold">{{ contact.location }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="mt-8 pt-8 border-t border-slate-700">
+                            <p class="text-slate-400 text-sm mb-4">Follow Me</p>
+                            <div class="flex gap-4">
+                                <a href="#" class="w-10 h-10 bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white rounded-lg flex items-center justify-center transition">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white rounded-lg flex items-center justify-center transition">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white rounded-lg flex items-center justify-center transition">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="glass p-6 md:p-8 rounded-xl">
+                    <h3 class="text-2xl font-semibold text-white mb-6">Send Me a Message</h3>
+                    <form id="contact-form" class="space-y-4">
+                        <!-- Name -->
+                        <div>
+                            <label for="name" class="block text-sm font-semibold text-slate-300 mb-2">Full Name *</label>
+                            <input type="text" id="name" name="name" required class="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition" placeholder="John Doe">
+                            <span class="error-message text-red-400 text-sm hidden">Please enter your name</span>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-slate-300 mb-2">Email Address *</label>
+                            <input type="email" id="email" name="email" required class="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition" placeholder="john@example.com">
+                            <span class="error-message text-red-400 text-sm hidden">Please enter a valid email</span>
+                        </div>
+
+                        <!-- Subject -->
+                        <div>
+                            <label for="subject" class="block text-sm font-semibold text-slate-300 mb-2">Subject *</label>
+                            <input type="text" id="subject" name="subject" required class="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition" placeholder="Project Discussion">
+                            <span class="error-message text-red-400 text-sm hidden">Please enter a subject</span>
+                        </div>
+
+                        <!-- Message -->
+                        <div>
+                            <label for="message" class="block text-sm font-semibold text-slate-300 mb-2">Message *</label>
+                            <textarea id="message" name="message" rows="4" required class="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:border-blue-400 focus:outline-none transition resize-none" placeholder="Tell me about your project..."></textarea>
+                            <span class="error-message text-red-400 text-sm hidden">Please enter a message</span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition transform hover:scale-105 flex items-center justify-center gap-2">
+                            <span id="submit-text">Send Message</span>
+                            <span id="submit-spinner" class="spinner hidden"></span>
+                        </button>
+
+                        <!-- Success Message -->
+                        <div id="success-message" class="hidden bg-green-500/20 border border-green-500 text-green-300 px-4 py-3 rounded-lg">
+                            ✓ Message sent successfully! I'll get back to you soon.
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/portfolio.js')}}"></script>
+
+{% endblock %}
