@@ -122,6 +122,7 @@ def admin_login():
             return redirect(url_for("admin_login"))
             
 
+@app.route('/admin')
 @app.route('/admin/dashboard')
 @admin_required
 def admin_dashboard():
